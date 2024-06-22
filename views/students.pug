@@ -1,0 +1,108 @@
+extends layout
+
+mixin student_row(students)
+  each student in students
+    - let img_url = `https://aws-bucket-hau.s3.ap-southeast-1.amazonaws.com/student-images/${student.student_id}.jpg`
+    tr
+      td= student.student_id
+      td
+        img(src=img_url)
+      td= student.first_name
+      td= student.last_name
+      td= student.dob
+      td= student.gender
+      td= student.email_id
+      td= student.phone_no
+      td= student.address
+      td= student.department
+      td= student.skill
+
+mixin required_input_text(label, name, placeholder)
+  div(class='required field')
+    label #{label}
+    input(type='text', name=name, placeholder=placeholder)
+
+mixin required_text_area_text(label, name, rows)
+  div(class='required field')
+    label #{label}
+    textarea(name=name, rows=rows)
+
+block content
+  div(class='ui grey right very wide sidebar inverted menu')
+  div(class='ui right flyout add_student_flyout')
+    i(class='close icon')
+    div(class='ui header')
+      i(class='add icon')
+      div(class='content') ADD STUDENT
+    div(class='content')
+      form(class='ui form', enctype="multipart/form-data", id='add_student_form', action='student', method='post')
+        div(class='equal width fields')
+          +required_input_text('First Name', 'first_name', 'First Name')
+          +required_input_text('Last Name', 'last_name', 'Last Name')
+        div(class='required field')
+          label Date of Birth
+          div(class='ui calendar')
+            div(class='ui input left icon')
+              i(class='calendar icon')
+              input(type='text', name='dob', placeholder='Pick a date')
+        div(class='required field')
+          label Image
+          div(class='ui file input')
+            input(type='file', name='student_image', accept='image/*')
+        div(class='required field')
+          label Gender
+          div(class='ui selection dropdown')
+            input(type='hidden', name='gender')
+            i(class='dropdown icon')
+            div(class='default text') Gender
+            div(class='menu')
+              div(class='item', data-value='Male') Male
+              div(class='item', data-value='Female') Female
+              div(class='item', data-value='Other') Other
+        +required_input_text('Email', 'email', 'Email')
+        +required_input_text('Phone Number', 'phone_no', 'Phone Number')
+        +required_text_area_text('Address', 'address', 2)
+        +required_input_text('Department', 'department', 'Department')
+        +required_text_area_text('Skill', 'skill', 'Skill')
+        button(class='ui green right floated column labeled icon button')
+          i(class='add icon')
+          p Add
+  div(class='pusher')
+    div(class='main_body')
+      div(class='six column row')
+        h1(class='ui left floated column header') Student List
+        button(class='ui green right floated column labeled icon button add__button')
+          i(class='add icon')
+          p Add student
+      table(class='ui sortable selectable celled table scrolling')
+        thead
+          tr
+            th ID
+            th Image
+            th First Name
+            th Last Name
+            th Day Of Birth
+            th Gender
+            th Email
+            th Phone Number
+            th Address
+            th Department
+            th Skill
+        tbody
+          +student_row(students)
+
+  script(type='text/javascript').
+    $('.sortable.table').tablesort();
+    $('.add__button').click(function () {
+      $('.add_student_flyout')
+              .flyout('toggle');
+      $('#add_student_form')
+              .trigger('reset');
+    });
+    $('.ui.calendar').calendar({
+      type: 'date'
+    });
+    $('.selection.dropdown')
+            .dropdown()
+    ;
+
